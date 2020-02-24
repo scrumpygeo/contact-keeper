@@ -43,6 +43,11 @@ const ContactState = props => {
   const [state, dispatch] = useReducer(contactReducer, initialState);
 
   // Add Contact action
+  const addContact = contact => {
+    // when using mongodb it uses an id; here we use uuid until we use mongodb
+    contact.id = uuid.v4();
+    dispatch({ type: ADD_CONTACT, payload: contact });
+  };
 
   // Delete Contact action
 
@@ -57,7 +62,7 @@ const ContactState = props => {
   // Clear filter action
 
   return (
-    <ContactContext.Provider value={{ contacts: state.contacts }}>
+    <ContactContext.Provider value={{ contacts: state.contacts, addContact }}>
       {props.children}
     </ContactContext.Provider>
   );

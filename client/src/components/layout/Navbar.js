@@ -28,7 +28,7 @@ Navbar.propTypes = {
 
 // Default prop for title:
 Navbar.defaultProps = {
-  title: 'Contact Keeper',
+  title: ' Contact Vault',
   icon: 'fas fa-id-card-alt'
 };
 
