@@ -4,7 +4,7 @@ import ContactContext from '../../context/contact/contactContext';
 const ContactForm = () => {
   const contactContext = useContext(ContactContext);
 
-  const { addContact, clearCurrent, current } = contactContext;
+  const { addContact, clearCurrent, updateContact, current } = contactContext;
 
   useEffect(() => {
     if (current !== null) {
@@ -33,7 +33,13 @@ const ContactForm = () => {
 
   const onSubmit = e => {
     e.preventDefault();
-    addContact(contact); // contact is our state which is all the form fields
+
+    if (current === null) {
+      addContact(contact); // contact is our state which is all the form fields
+    } else {
+      updateContact(contact);
+    }
+
     setContact({
       // back to default
       name: '',
@@ -41,6 +47,8 @@ const ContactForm = () => {
       phone: '',
       type: 'personal'
     });
+
+    clearAll();
   };
 
   const onChange = e =>
