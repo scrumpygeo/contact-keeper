@@ -14,28 +14,25 @@ import {
 
 // create initial state; initially hard code data for dev
 const AuthState = props => {
-    const initialState = {
+  const initialState = {
     token: localStorage.getItem('token'),
     isAuthenticated: null,
     loading: true,
     user: null,
     error: null
-    };
   };
 
   const [state, dispatch] = useReducer(authReducer, initialState);
 
-// Load User action
+  // Load User action
 
-// Register User
+  // Register User
 
-// Login User
+  // Login User
 
-// Logout User
+  // Logout User
 
-// Clear Errors
-
-
+  // Clear Errors
 
   return (
     <AuthContext.Provider
