@@ -10,7 +10,7 @@ connectDB();
 app.use(express.json({ extended: false }));
 
 app.get('/', (req, res) =>
-  res.json({ msg: 'Welcome to the ContactKeeper API.' })
+  res.json({ msg: 'Welcome to ContactVault, the Contact Keeper API.' })
 );
 
 // Define Routes
