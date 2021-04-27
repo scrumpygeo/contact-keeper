@@ -1,11 +1,11 @@
-const express = require('express');
-const router = express.Router();
-const bcrypt = require('bcryptjs');
-const jwt = require('jsonwebtoken');
-const config = require('config');
-const { check, validationResult } = require('express-validator');
+require('dotenv').config()
+const express = require('express')
+const router = express.Router()
+const bcrypt = require('bcryptjs')
+const jwt = require('jsonwebtoken')
+const { check, validationResult } = require('express-validator')
 
-const User = require('../models/User');
+const User = require('../models/User')
 
 // @route   POST api/users
 // @desc    Register a user
@@ -13,44 +13,42 @@ const User = require('../models/User');
 router.post(
   '/',
   [
-    check('name', 'Please enter a name.')
-      .not()
-      .isEmpty(),
+    check('name', 'Please enter a name.').not().isEmpty(),
     check('email', 'Please include a valid email.').isEmail(),
     check(
       'password',
       'Please enter password with 6 or more characters.'
-    ).isLength({ min: 6 })
+    ).isLength({ min: 6 }),
   ],
   async (req, res) => {
-    const errors = validationResult(req);
+    const errors = validationResult(req)
     if (!errors.isEmpty()) {
-      return res.status(400).json({ errors: errors.array() });
+      return res.status(400).json({ errors: errors.array() })
     }
     // res.send('passed'); // = test validation eg w and w/o password
-    const { name, email, password } = req.body;
+    const { name, email, password } = req.body
 
     try {
-      let user = await User.findOne({ email });
+      let user = await User.findOne({ email })
 
       if (user) {
-        return res.status(400).json({ msg: 'User already exists.' });
+        return res.status(400).json({ msg: 'User already exists.' })
       }
 
       // if user doesn't exist,
       user = new User({
         name,
         email,
-        password
-      });
+        password,
+      })
       // at this stage user object created but not saved in db
       // We need to encrypt pwd first
-      const salt = await bcrypt.genSalt(10);
+      const salt = await bcrypt.genSalt(10)
 
-      user.password = await bcrypt.hash(password, salt);
+      user.password = await bcrypt.hash(password, salt)
 
       // now save in db
-      await user.save();
+      await user.save()
       // next, send back a json web token
       // first check if data put in db:
       // res.send('User saved.'); // another test
@@ -58,28 +56,28 @@ router.post(
       // payload: object in token
       const payload = {
         user: {
-          id: user.id
-        }
-      };
+          id: user.id,
+        },
+      }
 
       // to generate token we need to sign it.
       // Secret should be in config, not here!
       jwt.sign(
         payload,
-        config.get('jwtSecret'),
+        process.env.jwtSecret,
         {
-          expiresIn: 360000
+          expiresIn: 360000,
         },
         (err, token) => {
-          if (err) throw err;
-          res.json({ token });
+          if (err) throw err
+          res.json({ token })
         }
-      );
+      )
     } catch (err) {
-      console.error(err.message);
-      res.status(500).send('Server Error');
+      console.error(err.message)
+      res.status(500).send('Server Error')
     }
   }
-);
+)
 
-module.exports = router;
+module.exports = router

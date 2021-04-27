@@ -1,12 +1,12 @@
-const express = require('express');
-const router = express.Router();
-const bcrypt = require('bcryptjs');
-const jwt = require('jsonwebtoken');
-const config = require('config');
-const auth = require('../middleware/auth');
-const { check, validationResult } = require('express-validator');
+require('dotenv').config()
+const express = require('express')
+const router = express.Router()
+const bcrypt = require('bcryptjs')
+const jwt = require('jsonwebtoken')
+const auth = require('../middleware/auth')
+const { check, validationResult } = require('express-validator')
 
-const User = require('../models/User');
+const User = require('../models/User')
 
 // @route   GET api/auth
 // @desc    Get logged in user
@@ -14,14 +14,14 @@ const User = require('../models/User');
 router.get('/', auth, async (req, res) => {
   try {
     // get user from db
-    const user = await User.findById(req.user.id).select('-password');
-    res.json(user);
+    const user = await User.findById(req.user.id).select('-password')
+    res.json(user)
   } catch (err) {
-    console.error(err.message);
-    res.status(500).send('Server Error');
+    console.error(err.message)
+    res.status(500).send('Server Error')
   }
-  res.send('Get logged in user');
-});
+  res.send('Get logged in user')
+})
 
 // @route   POST api/auth
 // @desc    Auth user and get token
@@ -30,57 +30,57 @@ router.post(
   '/',
   [
     check('email', 'Please include a valid email').isEmail(),
-    check('password', 'Password is required').exists()
+    check('password', 'Password is required').exists(),
   ],
   async (req, res) => {
-    const errors = validationResult(req);
+    const errors = validationResult(req)
     if (!errors.isEmpty()) {
-      return res.status(400).json({ errors: errors.array() });
+      return res.status(400).json({ errors: errors.array() })
     }
 
-    const { email, password } = req.body;
+    const { email, password } = req.body
 
     try {
-      let user = await User.findOne({ email });
+      let user = await User.findOne({ email })
 
       if (!user) {
-        return res.status(400).json({ msg: 'Invalid Credentials.' });
+        return res.status(400).json({ msg: 'Invalid Credentials.' })
       }
 
       // if there IS a user, then check the pwd:
-      const isMatch = await bcrypt.compare(password, user.password);
+      const isMatch = await bcrypt.compare(password, user.password)
 
       if (!isMatch) {
-        return res.status(400).json({ msg: 'Invalid Credentials' });
+        return res.status(400).json({ msg: 'Invalid Credentials' })
       }
 
       // if password matches:
       const payload = {
         user: {
-          id: user.id
-        }
-      };
+          id: user.id,
+        },
+      }
 
       // to generate token we need to sign it.
       // Secret should be in config, not here!
       jwt.sign(
         payload,
-        config.get('jwtSecret'),
+        process.env.jwtSecret,
         {
-          expiresIn: 360000
+          expiresIn: 360000,
         },
         (err, token) => {
-          if (err) throw err;
-          res.json({ token });
+          if (err) throw err
+          res.json({ token })
         }
-      );
+      )
     } catch (err) {
-      console.error(err.message);
-      res.status(500).send('Server Error');
+      console.error(err.message)
+      res.status(500).send('Server Error')
     }
   }
-);
+)
 
-module.exports = router;
+module.exports = router
 
 // we have 2 routes: one to get logged in user and tother to get the token.
